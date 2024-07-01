@@ -12,9 +12,10 @@ import { UserToDoTask } from '../models/userToDoTask';
 
 const router = express.Router();
 
-router.post('/api/tasks', async (req: Request, res: Response) => {
+router.post('/tasks', async (req: Request, res: Response) => {
   try {
     const task: UserToDoTask = req.body;
+    console.log(task);
     const newTask = await createTask(task);
     res.status(201).json(newTask);
   } 
@@ -24,7 +25,7 @@ router.post('/api/tasks', async (req: Request, res: Response) => {
   }
 });
 
-router.get('/api/tasks/:id', async (req: Request, res: Response) => {
+router.get('/tasks/:id', async (req: Request, res: Response) => {
   try {
     const taskId = parseInt(req.params.id);
     const task = await getTaskById(taskId);
@@ -40,9 +41,10 @@ router.get('/api/tasks/:id', async (req: Request, res: Response) => {
   }
 });
 
-router.get('/api/tasks', async (req: Request, res: Response) => {
+router.get('/tasks', async (req: Request, res: Response) => {
   try {
     const username = req.query.username as string;
+    console.log(username);
     const tasks = await getAllTasksByUsername(username);
     res.json(tasks);
   } 
@@ -52,7 +54,7 @@ router.get('/api/tasks', async (req: Request, res: Response) => {
   }
 });
 
-router.put('/api/tasks/:id', async (req: Request, res: Response) => {
+router.put('/tasks/:id', async (req: Request, res: Response) => {
   try {
     const taskId = parseInt(req.params.id);
     const updates: Partial<UserToDoTask> = req.body;
@@ -69,7 +71,7 @@ router.put('/api/tasks/:id', async (req: Request, res: Response) => {
   }
 });
 
-router.delete('/api/tasks/:id', async (req: Request, res: Response) => {
+router.delete('/tasks/:id', async (req: Request, res: Response) => {
   try {
     const taskId = parseInt(req.params.id);
     await deleteTask(taskId);
@@ -81,7 +83,7 @@ router.delete('/api/tasks/:id', async (req: Request, res: Response) => {
   }
 });
 
-router.patch('/api/tasks/accomplished', async (req: Request, res: Response) => {
+router.patch('/tasks/accomplished', async (req: Request, res: Response) => {
   try {
     const { username, taskName } = req.body;
     const updatedTask = await markTaskAsAccomplished(username, taskName);
@@ -97,7 +99,7 @@ router.patch('/api/tasks/accomplished', async (req: Request, res: Response) => {
   }
 });
 
-router.patch('/api/tasks/unfulfilled', async (req: Request, res: Response) => {
+router.patch('/tasks/unfulfilled', async (req: Request, res: Response) => {
   try {
     const { username, taskName } = req.body;
     const updatedTask = await markTaskAsUnfulfilled(username, taskName);

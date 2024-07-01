@@ -60,40 +60,71 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import avatarImage from "../assets/avatar.webp"
+import avatarImage from "../assets/avatar.webp";
+import axios from 'axios';
 
 export default {
   name: 'PanelPage',
   setup() {
     const router = useRouter();
     const username = localStorage.getItem('username');
-    const todos = ref([
-      { id: 1, text: 'Finish project report', completed: false, startDate: new Date(), endDate: new Date(Date.now() + 86400000) },
-      { id: 2, text: 'Buy groceries', completed: false, startDate: new Date(), endDate: new Date(Date.now() + 86400000) },
-      { id: 3, text: 'Call mom', completed: false, startDate: new Date(), endDate: new Date(Date.now() + 86400000) },
-    ]);
+    const todos = ref([]);
     const newTodoText = ref('');
     const newTodoEndDate = ref('');
-    let lastTodoId = 3;
+    const lastTodoId = ref(0);
 
-    const addTodo = () => {
-      if (newTodoText.value.trim() !== '') {
-        todos.value.push({
-          id: ++lastTodoId,
-          text: newTodoText.value,
-          completed: false,
-          startDate: new Date(),
-          endDate: new Date(newTodoEndDate.value),
-        });
-        newTodoText.value = '';
-        newTodoEndDate.value = '';
+    const fetchTodos = async () => {
+      try {
+        const response = await axios.get('/api/items/tasks', { params: { username } });
+        todos.value = response.data.map(task => ({
+          id: task.id,
+          text: task.task_name,
+          completed: task.task_status === 'accomplished',
+          startDate: new Date(task.task_start_day),
+          endDate: new Date(task.task_end_day)
+        }));
+        lastTodoId.value = todos.value.length ? todos.value[todos.value.length - 1].id : 0;
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
       }
     };
 
-    const deleteTodo = (id) => {
-      todos.value = todos.value.filter((todo) => todo.id !== id);
+    const addTodo = async () => {
+      if (newTodoText.value.trim() !== '') {
+        const newTask = {
+          username,
+          task_name: newTodoText.value,
+          task_start_day: new Date().toISOString().split('T')[0],
+          task_end_day: newTodoEndDate.value,
+          task_status: 'pending'
+        };
+
+        try {
+          const response = await axios.post('/api/items/tasks', newTask);
+          todos.value.push({
+            id: response.data.id,
+            text: response.data.task_name,
+            completed: false,
+            startDate: new Date(response.data.task_start_day),
+            endDate: new Date(response.data.task_end_day)
+          });
+          newTodoText.value = '';
+          newTodoEndDate.value = '';
+        } catch (error) {
+          console.error('Error adding task:', error);
+        }
+      }
+    };
+
+    const deleteTodo = async (id) => {
+      try {
+        await axios.delete(`/api/items/tasks/${id}`);
+        todos.value = todos.value.filter((todo) => todo.id !== id);
+      } catch (error) {
+        console.error('Error deleting task:', error);
+      }
     };
 
     const formatDate = (date) => {
@@ -101,10 +132,13 @@ export default {
     };
 
     const quitAccount = () => {
-      // Implement account quit logic here
-      console.log('Quitting account...');
+      localStorage.removeItem('username');
       router.push('/');
     };
+
+    onMounted(() => {
+      fetchTodos();
+    });
 
     return {
       avatarImage,
