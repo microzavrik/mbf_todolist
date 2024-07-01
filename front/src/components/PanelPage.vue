@@ -62,13 +62,13 @@
 <script>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import avatarImage from "../assets/avatar.png"
+import avatarImage from "../assets/avatar.webp"
 
 export default {
   name: 'PanelPage',
   setup() {
     const router = useRouter();
-    const username = 'John Doe';
+    const username = localStorage.getItem('username');
     const todos = ref([
       { id: 1, text: 'Finish project report', completed: false, startDate: new Date(), endDate: new Date(Date.now() + 86400000) },
       { id: 2, text: 'Buy groceries', completed: false, startDate: new Date(), endDate: new Date(Date.now() + 86400000) },

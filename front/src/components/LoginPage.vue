@@ -54,7 +54,9 @@ export default {
           password: password.value,
         });
         console.log('Login successful:', response.data);
-        router.push('/');
+        // console.log("Username: ", response.data.user.username)
+        localStorage.setItem('username', response.data.user.username);
+        router.push('/panel');
       } catch (error) {
         console.error('Login failed:', error);
       }

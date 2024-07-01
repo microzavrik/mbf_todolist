@@ -77,6 +77,7 @@ export default {
           password: password.value,
         });
         console.log('Registration successful:', response.data);
+        localStorage.setItem('username', response.data.user.username);
         router.push('/login');
       } catch (error) {
         console.error('Registration failed:', error);
