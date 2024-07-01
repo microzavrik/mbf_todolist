@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import MainPage from "../components/MainPage.vue"
 import LoginPage from "../components/LoginPage.vue"
 import RegisterPage from "../components/RegisterPage.vue"
+import PanelPage from "../components/PanelPage.vue" 
 
 
 const routes = [
@@ -17,6 +18,10 @@ const routes = [
     {
         path:'/register',
         component: RegisterPage
+    },
+    {
+        path:'/panel',
+        component: PanelPage
     }
 ]
 
